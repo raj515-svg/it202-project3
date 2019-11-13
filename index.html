@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>HTML5 Canvas Shooter Game Tutorial Part 1</title>
+    <style>
+        body {
+            padding:0;
+            margin:0;
+            background:#666;
+        }
+        canvas {
+            display:block;
+            margin:30px auto 0;
+            border:1px solid black;
+            background:#000;
+        }
+    </style>
+    <script>
+        var canvas,
+            ctx,
+            lives = 3,
+            width = 600,
+            height = 600,
+            obstaclesTotal = 2,
+            obstacles = [],
+            obstacle_x = 50,
+            obstacle_y = -45,
+            obstacle_w = 50,
+            obstacle_h = 50,
+            speed = 2,
+            rightKey = false,
+            leftKey = false,
+            upKey = false,
+            downKey = false,
+            player_x = (width / 2) - 25,
+            player_y = height - 75,
+            player_w = 50,
+            player_h = 50;
+        for(var i = 0; i < obstaclesTotal; i++) {
+            obstacles.push([obstacle_x, obstacle_y, obstacle_w, obstacle_h, speed]);
+            obstacle_x += obstacle_w + 60;
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, width, height);
+        }
+
+        function drawObstacles() {
+            for(var i = 0; i < obstacles.length; i++) {
+                ctx.fillStyle = '#f00';
+                ctx.fillRect(obstacles[i][0], obstacles[i][1], obstacle_w, obstacle_h);
+            }
+        }
+
+        function getDistance(player_x, player_y, obstacle_x, obstacle_y) {
+            let xDis = obstacle_x - player_x;
+            let yDis = obstacle_y - player_y;
+            return Math.sqrt(Math.pow(xDis, 2) + Math.pow(yDis, 2))
+        }
+
+        function drawPlayer() {
+            if(rightKey) player_x += 5;
+            else if(leftKey) player_x -= 5;
+            if(upKey) player_y -= 5;
+            else if(downKey) player_y += 5;
+            if(player_x <= 0) player_x = 0;
+            if((player_x + player_w) >= width) player_x = width - player_w;
+            if(player_y <= 0) player_y = 0;
+            if((player_y + player_h) >= height) player_y = height - player_h;
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(player_x, player_y, player_w, player_h);
+        }
+
+        function moveObstacles() {
+            for(var i = 0; i < obstacles.length; i++) {
+                if(obstacles[i][1] < height) {
+                    obstacles[i][1] += obstacles[i][4];
+                } else if(obstacles[i][1] > height - 1) {
+                    obstacles[i][1] = -45;
+                }
+            }
+        }
+
+        function init() {
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            setInterval(gameLoop, 25);
+            document.addEventListener('keydown', keyDown, false);
+            document.addEventListener('keyup', keyUp, false);
+        }
+
+        function gameLoop() {
+            if(player_x < obstacle_x + obstacle_w && player_x + player_w > obstacle_x && player_y < obstacle_y + obstacle_h && player_y + player_h > obstacle_y) {
+                lives--;
+            }
+            
+                clearCanvas();
+                moveObstacles();
+                drawObstacles();
+                drawPlayer();
+               
+            //console.log(getDistance(player_x,player_y,obstacle_x,obstacle_y));
+        }
+
+        function keyDown(e) {
+            if(e.keyCode == 39) rightKey = true;
+            else if(e.keyCode == 37) leftKey = true;
+            if(e.keyCode == 38) upKey = true;
+            else if(e.keyCode == 40) downKey = true;
+        }
+
+        function keyUp(e) {
+            if(e.keyCode == 39) rightKey = false;
+            else if(e.keyCode == 37) leftKey = false;
+            if(e.keyCode == 38) upKey = false;
+            else if(e.keyCode == 40) downKey = false;
+        }
+        window.requestAnimationFrame(init);
+    </script>
+</head>
+
+<body>
+    <canvas id="canvas" width="600" height="600"></canvas>
+</body>
+
+</html>
