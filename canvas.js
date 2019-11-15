@@ -2,14 +2,101 @@
    canvas.height = window.innerHeight;
    var c,
        ctx,
-       x = (canvas.width / 2) - 25,
-       y = canvas.height - 75,
        r = 50,
-       speed = 2,
+       obstacle_x = canvas.width,
+       obstacle_y = (innerHeight / 2),
+       bonus_x = canvas.width,
+       bonus_y = (innerHeight / 4),
+       player_x = (canvas.width / 2) - 25,
+       player_y = canvas.height - 75,
+       speedObs_x = 10,
+       speedObs_y = -10,
+       speedBonus_x = 10,
+       speedBonus_y = -10,
        rightKey = false,
        leftKey = false,
        upKey = false,
-       downKey = false;
+       downKey = false,
+       lives = 3,
+       score = 0;
+
+   function drawPlayer() {
+       if(rightKey) {
+           player_x += 5;
+       }
+       if(leftKey) {
+           player_x -= 5;
+       }
+       if(upKey) {
+           player_y -= 5;
+       }
+       if(downKey) {
+           player_y += 5;
+       }
+       if(player_x - r <= 0) {
+           player_x = r;
+       }
+       if((player_x + r) >= canvas.width) {
+           player_x = canvas.width - r;
+       }
+       if(player_y - r <= 0) {
+           player_y = r;
+       }
+       if((player_y + r) >= canvas.height) {
+           player_y = canvas.height - r;
+       }
+   }
+
+   function init() {
+       c = document.getElementById('canvas');
+       ctx = c.getContext('2d');
+   }
+
+   function draw() {
+       ctx.beginPath();
+       ctx.clearRect(0, 0, canvas.width, canvas.height);
+       ctx.arc(player_x, player_y, r, 0, 2 * Math.PI, false);
+       ctx.fillStyle = 'blue';
+       ctx.fill();
+       ctx.closePath();
+       document.addEventListener('keydown', keyDown, false);
+       document.addEventListener('keyup', keyUp, false);
+       //obstacle 
+       ctx.beginPath();
+       ctx.arc(obstacle_x, obstacle_y, r, 0, 2 * Math.PI, false);
+       ctx.fillStyle = 'red';
+       ctx.fill()
+       ctx.closePath();
+       //bonus
+       ctx.beginPath();
+       ctx.arc(bonus_x, bonus_y, r, 0, 2 * Math.PI, false);
+       ctx.fillStyle = 'green';
+       ctx.fill();
+       ctx.closePath();
+   }
+
+   function moveObjects() {
+       obstacle_x -= speedObs_x;
+       obstacle_y -= speedObs_y;
+       bonus_x -= speedBonus_x;
+       bonus_y -= speedBonus_y;
+       if(obstacle_x - r <= 0 || obstacle_x >= canvas.width) {
+           speedObs_x = -speedObs_x;
+           console.log(canvas.width);
+       }
+       if(obstacle_y - r <= 0 || obstacle_y >= canvas.height) {
+           speedObs_y = -speedObs_y;
+           console.log(canvas.width);
+       }
+       if(bonus_x - r <= 0 || bonus_x >= canvas.width) {
+           speedBonus_x = -speedBonus_x;
+           console.log(canvas.width);
+       }
+       if(bonus_y - r <= 0 || bonus_y >= canvas.height) {
+           speedBonus_y = -speedBonus_y;
+           console.log(canvas.width);
+       }
+   }
 
    function getDistance(player_x, player_y, obstacle_x, obstacle_y) {
        let xDis = obstacle_x - player_x;
@@ -17,51 +104,42 @@
        return Math.sqrt(Math.pow(xDis, 2) + Math.pow(yDis, 2))
    }
 
-   function drawPlayer() {
-       if(rightKey) {
-           x += 5;
-       }
-       if(leftKey) {
-           x -= 5;
-       }
-       if(upKey) {
-           y -= 5;
-       }
-       if(downKey) {
-           y += 5;
-       }
-       if(x - r <= 0) {
-           x = r;
-       }
-       if((x + r) >= canvas.width) {
-           x = canvas.width - r;
-       }
-       if(y - r <= 0) {
-           y = r;
-       }
-       if((y + r) >= canvas.height) {
-           y = canvas.height - r;
-       }
+   function badCollide(player_x, player_y, obstacle_x, obstacle_y) {   
+       if(getDistance(player_x, player_y, obstacle_x, obstacle_y) <= 100) {      
+           return true;   
+       }    
+       else {        
+           return false;    
+       }    
    }
 
-   function init() {
-       c = document.getElementById('canvas');
-       ctx = c.getContext('2d');
-       ctx.beginPath();
-       ctx.clearRect(0, 0, canvas.width, canvas.height);
-       ctx.arc(x, y, r, 0, 2 * Math.PI, false);
-       ctx.fillStyle = 'blue';
-       ctx.fill();
-       document.addEventListener('keydown', keyDown, false);
-       document.addEventListener('keyup', keyUp, false);
+   function goodCollide(player_x, player_y, bonus_x, bonus_y) {      
+       if(getDistance(player_x, player_y, bonus_x, bonus_y) <= 100) {      
+           return true;   
+       }    
+       else {        
+           return false;    
+       }
    }
 
    function gameLoop() {
        requestAnimationFrame(gameLoop);
-       console.log(x);
-       init()
+       //console.log(obstacle_x);
+       //console.log(obstacle_y);
+       init();
+       draw();
+       moveObjects();
        drawPlayer();
-       //console.log(getDistance(player_x,player_y,obstacle_x,obstacle_y));
+       if(badCollide(player_x, player_y, obstacle_x, obstacle_y) == true) {
+           speedObs_x = -speedObs_x;
+           speedObs_y = -speedObs_y;
+           lives--;
+       }
+       if(goodCollide(player_x, player_y, bonus_x, bonus_y) == true) {
+           speedBonus_x = -speedBonus_x;
+           speedBonus_y = -speedBonus_y;
+           score += 1;
+       }
    }
 
    function keyDown(e) {
