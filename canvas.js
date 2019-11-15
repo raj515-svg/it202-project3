@@ -4,11 +4,13 @@
        ctx,
        r = 50,
        obstacle_x = canvas.width,
-       obstacle_y = (innerHeight / 2),
+       obstacle_y = canvas.height / (Math.random() * (10 - 1) + 1),
        bonus_x = canvas.width,
-       bonus_y = (innerHeight / 4),
+       bonus_y = canvas.height / (Math.random() * (3 - 1) + 1),
        player_x = (canvas.width / 2) - 25,
        player_y = canvas.height - 75,
+       speedPlayer_x = 10,
+       speedPlayer_y = -10,
        speedObs_x = 10,
        speedObs_y = -10,
        speedBonus_x = 10,
@@ -18,20 +20,21 @@
        upKey = false,
        downKey = false,
        lives = 3,
-       score = 0;
+       score = 0,
+       level = 1;
 
    function drawPlayer() {
        if(rightKey) {
-           player_x += 5;
+           player_x += speedPlayer_x;
        }
        if(leftKey) {
-           player_x -= 5;
+           player_x -= speedPlayer_x;
        }
        if(upKey) {
-           player_y -= 5;
+           player_y += speedPlayer_y;
        }
        if(downKey) {
-           player_y += 5;
+           player_y -= speedPlayer_y;
        }
        if(player_x - r <= 0) {
            player_x = r;
@@ -55,6 +58,11 @@
    function draw() {
        ctx.beginPath();
        ctx.clearRect(0, 0, canvas.width, canvas.height);
+       ctx.font = "16px Calibri";    
+       ctx.fillStyle = "white";    
+       ctx.fillText("Score: " + score, 8, 20);    
+       ctx.fillText("Level: " + level, 8, 40);    
+       ctx.fillText("Lives: " + lives, 8, 60);
        ctx.arc(player_x, player_y, r, 0, 2 * Math.PI, false);
        ctx.fillStyle = 'blue';
        ctx.fill();
@@ -124,8 +132,6 @@
 
    function gameLoop() {
        requestAnimationFrame(gameLoop);
-       //console.log(obstacle_x);
-       //console.log(obstacle_y);
        init();
        draw();
        moveObjects();
@@ -136,10 +142,38 @@
            lives--;
        }
        if(goodCollide(player_x, player_y, bonus_x, bonus_y) == true) {
-           speedBonus_x = -speedBonus_x;
-           speedBonus_y = -speedBonus_y;
-           score += 1;
+           speedBonus_x = -speedObs_x;
+           speedBonus_y = -speedObs_y;
+           score += 5;
        }
+//        if(score == 10) {
+//            level++;
+//            speedBonus_x += 10;
+//            speedBonus_y += 10;
+//            speedObs_x += 10;
+//            speedObs_y += 10;
+//        }
+//        if(score == 20) {
+//            level++;
+//            speedBonus_x += 10;
+//            speedBonus_y += 10;
+//            speedObs_x += 10;
+//            speedObs_y += 10;
+//        }
+//        if(score == 30) {
+//            level++;
+//            speedBonus_x += 10;
+//            speedBonus_y += 10;
+//            speedObs_x += 10;
+//            speedObs_y += 10;
+//        }
+       if (level>3){
+           alert('You Won');
+       }
+//        if(lives <= 0) {
+//            alert('GameOver');
+//            return;
+//        }
    }
 
    function keyDown(e) {
