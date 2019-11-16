@@ -4,17 +4,14 @@
     "start_url": "index.html",
     "background_color": "#FFE1C4",
     "display": "standalone",
-    "icons": [
-    {
-      "src": "img/icons-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "img/icons-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
+    "icons": [{
+        "src": "img/icons-192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+    }, {
+        "src": "img/icons-512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+    }],
     "theme_color": "#FFE1C4"
 }
